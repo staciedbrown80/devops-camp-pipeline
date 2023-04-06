@@ -63,6 +63,16 @@ pipeline {
                       }
                   }
               }
+                //STACIE'S LAB 7 STEP 3A.
+                stage('Security scanning') {
+                    steps {
+                  withCredentials([usernamePassword(credentialsId: 'sbrown-harbor-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                      echo "Scanning $DB_IMAGE_NAME image"
+                      sh 'python harbor_scanner.py -i $DB_IMAGE_NAME -r $HARBOR_REGISTRY -p $HARBOR_PROJECT -c ${USERNAME}:${PASSWORD}'
+                    }
+                 }       
+             }
+
               stage('Deploy') {
                   steps {
                       sh 'kubectl -n sbrown set image deployment/db-deployment db-deployment=$HARBOR_REGISTRY/$HARBOR_PROJECT/$DB_IMAGE_NAME:$COMMIT_HASH-$PIPELINE_HASH'
